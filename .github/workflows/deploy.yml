@@ -1,4 +1,4 @@
-name: Deploy Vault to Root Pages
+name: Deploy to GitHub Pages
 
 on:
   push:
