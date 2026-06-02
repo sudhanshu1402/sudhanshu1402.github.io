@@ -3,13 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sudhanshu Singh — Backend Engineer</title>
+    <title>Sudhanshu Singh - Backend Engineer</title>
     <meta name="description" content="Backend engineer building distributed systems, authentication infrastructure, and observability tooling. Portfolio and project archive.">
     <meta name="color-scheme" content="dark light">
 
     <!-- Open Graph -->
-    <meta property="og:title" content="Sudhanshu Singh — Backend Engineer">
-    <meta property="og:description" content="Distributed systems · Auth infra · Observability · LLM orchestration. A curated archive of engineering projects.">
+    <meta property="og:title" content="Sudhanshu Singh - Backend Engineer">
+    <meta property="og:description" content="Distributed systems, auth infrastructure, observability, and LLM orchestration. A working archive of engineering projects.">
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://sudhanshu1402.github.io">
 
@@ -411,7 +411,7 @@
 
     <nav aria-label="Primary">
         <div class="nav-inner">
-            <a href="#top" class="brand" aria-label="Sudhanshu Singh — home">
+            <a href="#top" class="brand" aria-label="Sudhanshu Singh home">
                 <span class="dot" aria-hidden="true"></span>
                 Sudhanshu Singh<span class="tag" style="color:var(--text-mute);font-weight:500;">&nbsp;/ Engineer</span>
             </a>
@@ -436,7 +436,7 @@
         <div class="wrap">
             <span class="eyebrow"><span class="pulse" aria-hidden="true"></span> Backend Engineer @ fiddle-tools</span>
             <h1>Building <span class="grad">distributed systems</span><br>that hold up in production.</h1>
-            <p class="hero-lead">I design and ship backend infrastructure — job orchestration, multi-tenant auth, observability, and LLM pipelines — in TypeScript &amp; Node.js. This is my working archive.</p>
+            <p class="hero-lead">I design and ship backend infrastructure: job orchestration, multi-tenant auth, observability, and LLM pipelines, mostly in TypeScript and Node.js. This is my working archive.</p>
             <div class="cta-row">
                 <a class="btn btn-primary" href="#featured">
                     View featured work
@@ -484,7 +484,7 @@
 
     <footer>
         <div class="wrap foot-inner">
-            <p>© <span id="year"></span> Sudhanshu Singh · Built with vanilla HTML, CSS &amp; JS.</p>
+            <p>© <span id="year"></span> Sudhanshu Singh. Built with vanilla HTML, CSS &amp; JS.</p>
             <div class="foot-links">
                 <a href="https://github.com/sudhanshu1402" target="_blank" rel="noopener">GitHub</a>
                 <a href="https://www.linkedin.com/in/sudhanshusingh1402/" target="_blank" rel="noopener">LinkedIn</a>
@@ -565,7 +565,7 @@
                 card.setAttribute("aria-label", "View details for " + proj.name);
 
                 var diffColor = DIFF_COLOR[proj.difficulty] || "var(--text-dim)";
-                var topRight = '<span class="diff" style="color:' + diffColor + '">' + escapeHtml(proj.difficulty || "—") + "</span>";
+                var topRight = '<span class="diff" style="color:' + diffColor + '">' + escapeHtml(proj.difficulty || "-") + "</span>";
                 var topLeft = proj.tier === "showcase"
                     ? '<span class="badge featured-badge"><span class="led" aria-hidden="true"></span>Featured</span>'
                     : '<span class="badge">' + escapeHtml(label(proj.category)) + "</span>";
@@ -574,7 +574,7 @@
                     '<div class="card-top">' + topLeft + topRight + "</div>" +
                     '<div class="card-body">' +
                         "<h3>" + escapeHtml(proj.name) + "</h3>" +
-                        '<div class="card-meta">' + escapeHtml(label(proj.category)) + " · " + escapeHtml(proj.type || "") + "</div>" +
+                        '<div class="card-meta">' + escapeHtml(label(proj.category)) + " / " + escapeHtml(proj.type || "") + "</div>" +
                     "</div>" +
                     '<div class="card-foot">' +
                         '<span class="open">' + escapeHtml(proj.actionText || "View") + "</span>" +
@@ -648,13 +648,13 @@
                 lastFocused = document.activeElement;
                 $("modal-title").textContent = proj.name;
                 $("modal-category").textContent = label(proj.category);
-                $("modal-type").textContent = proj.type || "—";
-                $("modal-difficulty").textContent = proj.difficulty || "—";
+                $("modal-type").textContent = proj.type || "-";
+                $("modal-difficulty").textContent = proj.difficulty || "-";
 
                 var diffColor = DIFF_COLOR[proj.difficulty] || "var(--text-dim)";
                 var tags = "";
                 if (proj.tier === "showcase") tags += '<span class="badge featured-badge"><span class="led" aria-hidden="true"></span>Featured</span>';
-                tags += '<span class="diff" style="color:' + diffColor + '">' + escapeHtml(proj.difficulty || "—") + "</span>";
+                tags += '<span class="diff" style="color:' + diffColor + '">' + escapeHtml(proj.difficulty || "-") + "</span>";
                 $("modal-tags").innerHTML = tags;
 
                 var link = $("modal-link");
