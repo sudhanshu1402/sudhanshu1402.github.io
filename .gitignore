@@ -1,0 +1,16 @@
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Editor / tooling
+.vscode/
+.idea/
+.cache/
+.vercel
+
+# Dependencies / build (in case any tooling is added later)
+node_modules/
+dist/
