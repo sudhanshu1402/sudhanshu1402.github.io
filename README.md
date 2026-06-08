@@ -20,3 +20,4 @@ To add a project, append an object to `PROJECT_DATA` in `projects_data.js`. Coun
 
 - [System Design Portal](https://sudhanshu1402.github.io/system-design-portal): architecture breakdowns with Mermaid diagrams
 - [GitHub Profile](https://github.com/sudhanshu1402): featured distributed systems projects
+- [macOS Edition](https://sudhanshu1402.github.io/legacy-macos-portfolio/): just for fun, my portfolio rebuilt as a pixel-perfect macOS desktop (in `legacy-macos-portfolio/`)
