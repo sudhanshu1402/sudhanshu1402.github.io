@@ -21,7 +21,7 @@
     }
 
     :root {
-      --blur: blur(40px);
+      --blur: blur(20px);
       --glass: rgba(255, 255, 255, .72);
       --glass-b: rgba(255, 255, 255, .75);
       --shadow: 0 20px 60px rgba(0, 0, 0, .18);
@@ -528,7 +528,13 @@
       transition: box-shadow .2s;
       min-width: 280px;
       min-height: 180px;
-      will-change: transform;
+    }
+
+    /* Drop the costly backdrop blur while dragging — it is re-rasterized every
+       frame and is the main source of drag jank. */
+    .window.dragging {
+      backdrop-filter: none !important;
+      -webkit-backdrop-filter: none !important;
     }
 
     .window.focused {
@@ -2089,8 +2095,8 @@
     .sl-box {
       width: 640px;
       background: rgba(235, 235, 235, .93);
-      backdrop-filter: blur(60px);
-      -webkit-backdrop-filter: blur(60px);
+      backdrop-filter: blur(22px);
+      -webkit-backdrop-filter: blur(22px);
       border-radius: 14px;
       box-shadow: 0 30px 80px rgba(0, 0, 0, .35);
       overflow: hidden
@@ -2585,8 +2591,8 @@
       max-height: 70vh;
       z-index: 10005;
       background: rgba(20, 20, 20, 0.92);
-      backdrop-filter: blur(40px);
-      -webkit-backdrop-filter: blur(40px);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
       border-radius: 0 0 24px 24px;
       padding: 60px 16px 24px;
       transform: translateY(-100%);
@@ -2661,8 +2667,8 @@
       z-index: 10006;
       min-width: 200px;
       background: rgba(30, 30, 30, 0.95);
-      backdrop-filter: blur(30px);
-      -webkit-backdrop-filter: blur(30px);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
       border-radius: 14px;
       overflow: hidden;
       box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
@@ -2771,8 +2777,8 @@
       height: 100vh;
       z-index: 10010;
       background: rgba(0, 0, 0, 0.7);
-      backdrop-filter: blur(30px);
-      -webkit-backdrop-filter: blur(30px);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
       display: none;
       flex-direction: column;
       align-items: center;
@@ -2861,8 +2867,8 @@
       right: 16px;
       z-index: 9800;
       background: rgba(30, 30, 30, 0.92);
-      backdrop-filter: blur(30px);
-      -webkit-backdrop-filter: blur(30px);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
       border-radius: 16px;
       padding: 14px 18px;
       color: #fff;
@@ -3048,8 +3054,8 @@
         margin: 8px 10px 34px;
         padding: 12px 20px;
         background: rgba(255, 255, 255, 0.2);
-        backdrop-filter: blur(40px);
-        -webkit-backdrop-filter: blur(40px);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
         border-radius: 28px;
         display: flex;
         justify-content: space-around;
@@ -3285,7 +3291,7 @@
         padding: 12px;
       }
 
-      .stat-grid {
+      .stats-grid {
         grid-template-columns: 1fr 1fr;
       }
 
@@ -5758,6 +5764,10 @@
     function updateWorldClock() {
       const body = document.getElementById('wc-body');
       if (!body) return;
+      // Skip the full innerHTML rebuild when the Clock window isn't visible —
+      // no point reflowing 7 cards every second for a hidden window.
+      const win = document.getElementById('win-worldclock');
+      if (win && win.style.display === 'none') return;
       body.innerHTML = TZ_LIST.map(z => {
         const now = new Date();
         const time = now.toLocaleString('en-US', { timeZone: z.tz, hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true });
@@ -5888,12 +5898,29 @@
        ============================================================ */
     (() => {
       let drag = null, ox = 0, oy = 0, resize = null, rx, ry, rw, rh;
+      let pendX = 0, pendY = 0, raf = 0;
+      function flush() {
+        raf = 0;
+        if (!drag) return;
+        // Clamp to the viewport so a window can never be dragged off any edge
+        // and lost (the titlebar stays reachable).
+        const maxX = window.innerWidth - 80, maxY = window.innerHeight - 60;
+        drag.style.left = Math.min(maxX, Math.max(0, pendX)) + 'px';
+        drag.style.top = Math.min(maxY, Math.max(28, pendY)) + 'px';
+      }
       document.addEventListener('mousedown', e => {
         const h = e.target.closest('.wbar');
         if (h && !e.target.closest('.dot')) {
           const w = h.closest('.window');
           if (window.innerWidth <= 768 && w) { CW(w.id.replace('win-', '')); return; }
-          if (w && !w.dataset.max) { drag = w; const r = w.getBoundingClientRect(); ox = e.clientX - r.left; oy = e.clientY - r.top; focusW(w.id.replace('win-', '')); e.preventDefault(); }
+          if (w && !w.dataset.max) {
+            drag = w; const r = w.getBoundingClientRect(); ox = e.clientX - r.left; oy = e.clientY - r.top;
+            focusW(w.id.replace('win-', ''));
+            // Drag-time perf: promote to its own layer and drop the expensive
+            // backdrop blur (re-rasterized every frame) until release.
+            w.style.willChange = 'transform'; w.classList.add('dragging');
+            e.preventDefault();
+          }
         }
         const rh2 = e.target.closest('.resize-h');
         if (rh2) {
@@ -5902,10 +5929,13 @@
         }
       });
       document.addEventListener('mousemove', e => {
-        if (drag) { const x = Math.max(0, e.clientX - ox), y = Math.max(28, e.clientY - oy); drag.style.left = x + 'px'; drag.style.top = y + 'px'; }
+        if (drag) { pendX = e.clientX - ox; pendY = e.clientY - oy; if (!raf) raf = requestAnimationFrame(flush); }
         if (resize) { resize.style.width = Math.max(280, rw + (e.clientX - rx)) + 'px'; resize.style.height = Math.max(180, rh + (e.clientY - ry)) + 'px'; }
       });
-      document.addEventListener('mouseup', () => { drag = null; resize = null; });
+      document.addEventListener('mouseup', () => {
+        if (drag) { drag.style.willChange = ''; drag.classList.remove('dragging'); }
+        drag = null; resize = null;
+      });
     })();
 
     /* ============================================================
@@ -5962,10 +5992,18 @@
        ============================================================ */
     const tb = document.getElementById('term-body');
     let termInp = null;
+    const termHist = [];   // command history for up/down recall
+    let histIdx = 0;
     function tPrint(lines) {
       if (lines === '__clear__') { tb.innerHTML = ''; tInit(); return; }
       if (termInp) termInp.closest('div').remove();
-      lines.forEach(l => { const d = document.createElement('div'); d.className = 'tl'; d.innerHTML = `<span class="to">${l}</span>`; tb.appendChild(d); });
+      lines.forEach(l => {
+        const d = document.createElement('div'); d.className = 'tl';
+        // Lines may be plain strings or {c: cssClass, t: text} objects.
+        if (l && typeof l === 'object' && 't' in l) d.innerHTML = `<span class="${l.c || 'to'}">${l.t}</span>`;
+        else d.innerHTML = `<span class="to">${l}</span>`;
+        tb.appendChild(d);
+      });
       tInit(); tb.scrollTop = tb.scrollHeight;
     }
     function tInit() {
@@ -5973,8 +6011,21 @@
       row.innerHTML = `<span class="tp">sudhanshu@macbook</span>&nbsp;<span class="td">~/portfolio</span>&nbsp;$&nbsp;`;
       termInp = document.createElement('input'); termInp.type = 'text'; termInp.className = 'term-inp'; termInp.autocomplete = 'off'; termInp.spellcheck = false;
       termInp.addEventListener('keydown', e => {
+        // Command history recall (most real terminals have this).
+        if (e.key === 'ArrowUp') {
+          e.preventDefault();
+          if (termHist.length) { histIdx = Math.max(0, histIdx - 1); termInp.value = termHist[histIdx]; const n = termInp.value.length; setTimeout(() => termInp && termInp.setSelectionRange(n, n), 0); }
+          return;
+        }
+        if (e.key === 'ArrowDown') {
+          e.preventDefault();
+          if (termHist.length) { histIdx = Math.min(termHist.length, histIdx + 1); termInp.value = termHist[histIdx] ?? ''; }
+          return;
+        }
         if (e.key !== 'Enter') return;
         const raw = termInp.value.trim(), cmd = raw.toLowerCase();
+        if (raw) termHist.push(raw);
+        histIdx = termHist.length;
         const echo = document.createElement('div'); echo.className = 'tl';
         echo.innerHTML = `<span class="tp">sudhanshu@macbook</span>&nbsp;<span class="td">~/portfolio</span>&nbsp;$&nbsp;<span class="tc">${raw}</span>`;
         row.replaceWith(echo); termInp = null;
@@ -6530,22 +6581,28 @@
     if (window.innerWidth > 768) {
       const dockBar = document.querySelector('.dock-bar');
       if (dockBar) {
-        dockBar.addEventListener('mousemove', e => {
-          const dkItems = dockBar.querySelectorAll('.dk');
-          dkItems.forEach(item => {
-            const rect = item.getBoundingClientRect();
-            const cx = rect.left + rect.width / 2;
-            const dist = Math.abs(e.clientX - cx);
-            const scale = Math.max(1, 1.5 - dist / 120);
-            item.style.transform = `scale(${scale})`;
-            item.style.transition = 'transform 0.15s ease';
-          });
-        });
-        dockBar.addEventListener('mouseleave', () => {
-          dockBar.querySelectorAll('.dk').forEach(item => {
-            item.style.transform = 'scale(1)';
-          });
-        });
+        // Single magnifier: scale the inner .dkico (so labels/running-dots don't
+        // distort), with neighbor fan-out. Inline transform overrides the CSS
+        // hover rule, so the two no longer compound. Centers are cached (a
+        // transform doesn't move layout), so there's no per-frame reflow, and
+        // writes are batched in one rAF.
+        let icons = [], centers = [], lastX = 0, active = false, raf = 0;
+        function measure() {
+          icons = Array.from(dockBar.querySelectorAll('.dkico'));
+          centers = icons.map(ico => { const r = ico.getBoundingClientRect(); return r.left + r.width / 2; });
+        }
+        function apply() {
+          raf = 0;
+          for (let i = 0; i < icons.length; i++) {
+            const cx = centers[i];
+            const scale = active && cx != null ? Math.max(1, 1.5 - Math.abs(lastX - cx) / 130) : 1;
+            icons[i].style.transform = `translateY(${-(scale - 1) * 26}px) scale(${scale})`;
+          }
+        }
+        dockBar.addEventListener('mouseenter', () => { measure(); active = true; });
+        dockBar.addEventListener('mousemove', e => { lastX = e.clientX; active = true; if (!raf) raf = requestAnimationFrame(apply); });
+        dockBar.addEventListener('mouseleave', () => { active = false; if (!raf) raf = requestAnimationFrame(apply); });
+        window.addEventListener('resize', () => { if (active) measure(); });
       }
     }
 
@@ -6580,7 +6637,7 @@
     (function () {
       let count = parseInt(localStorage.getItem('visitCount') || '0') + 1;
       localStorage.setItem('visitCount', count);
-      const statCards = document.querySelector('.stat-grid');
+      const statCards = document.querySelector('.stats-grid');
       if (statCards) {
         const card = document.createElement('div');
         card.className = 'stat-card';
@@ -6621,7 +6678,7 @@
        GITHUB CONTRIBUTION GRAPH
        ============================================================ */
     (function () {
-      const statWin = document.querySelector('#win-stats .stat-grid');
+      const statWin = document.querySelector('#win-stats .stats-grid');
       if (!statWin) return;
       const wrap = document.createElement('div');
       wrap.style.cssText = 'grid-column: 1/-1; padding: 16px; background: rgba(0,0,0,.04); border-radius: 12px; margin-top: 8px;';
@@ -6880,7 +6937,7 @@
     }
     // Add screen time card to stats
     (function () {
-      const grid = document.querySelector('.stat-grid');
+      const grid = document.querySelector('.stats-grid');
       if (!grid) return;
       const card = document.createElement('div');
       card.className = 'stat-card';
@@ -7252,19 +7309,29 @@
         el.id = z;
         document.body.appendChild(el);
       });
-      let snapActive = null;
-      const origMM = document.onmousemove;
+      let snapActive = null, snapWin = null;
+      const clearZones = () => zones.forEach(z => document.getElementById(z).classList.remove('show'));
       document.addEventListener('mousemove', function (e) {
-        if (!document.querySelector('.window:active')) {
-          zones.forEach(z => document.getElementById(z).classList.remove('show'));
-          return;
-        }
+        const w = document.querySelector('.window:active');
+        if (!w) { clearZones(); snapActive = null; snapWin = null; return; }
+        snapWin = w;
         const x = e.clientX, y = e.clientY;
-        zones.forEach(z => document.getElementById(z).classList.remove('show'));
+        clearZones();
         if (x < 8) { document.getElementById('snap-left').classList.add('show'); snapActive = 'left'; }
         else if (x > window.innerWidth - 8) { document.getElementById('snap-right').classList.add('show'); snapActive = 'right'; }
         else if (y < 36) { document.getElementById('snap-top').classList.add('show'); snapActive = 'top'; }
         else { snapActive = null; }
+      });
+      // Apply the snap on release (overlays previously showed but never snapped).
+      document.addEventListener('mouseup', function () {
+        if (snapActive && snapWin) {
+          const top = 28, h = 'calc(100vh - 104px)';   // menubar 28 + dock ~76
+          if (snapActive === 'left') Object.assign(snapWin.style, { left: '0px', top: top + 'px', width: '50vw', height: h });
+          else if (snapActive === 'right') Object.assign(snapWin.style, { left: '50vw', top: top + 'px', width: '50vw', height: h });
+          else if (snapActive === 'top') Object.assign(snapWin.style, { left: '0px', top: top + 'px', width: '100vw', height: h });
+        }
+        clearZones();
+        snapActive = null; snapWin = null;
       });
     })();
 
@@ -7274,10 +7341,17 @@
     (function () {
       if (window.innerWidth <= 768) return;
       const desk = document.getElementById('desktop');
+      let pmx = 0, pmy = 0, praf = 0;
+      function applyParallax() {
+        praf = 0;
+        desk.style.backgroundPosition = `calc(50% + ${pmx}px) calc(50% + ${pmy}px)`;
+      }
       document.addEventListener('mousemove', function (e) {
-        const mx = (e.clientX / window.innerWidth - 0.5) * 8;
-        const my = (e.clientY / window.innerHeight - 0.5) * 8;
-        desk.style.backgroundPosition = `calc(50% + ${mx}px) calc(50% + ${my}px)`;
+        // Moving a full-screen gradient bg repaints the whole desktop layer;
+        // batch to one write per frame instead of one per mouse event.
+        pmx = (e.clientX / window.innerWidth - 0.5) * 8;
+        pmy = (e.clientY / window.innerHeight - 0.5) * 8;
+        if (!praf) praf = requestAnimationFrame(applyParallax);
       });
     })();
 
@@ -7285,7 +7359,7 @@
        3D TILT on hover for cards
        ============================================================ */
     document.addEventListener('mousemove', function (e) {
-      const card = e.target.closest('.stat-card, .wc-item, .wx-detail');
+      const card = (e.target && e.target.closest) ? e.target.closest('.stat-card, .wc-item, .wx-detail') : null;
       if (!card) return;
       const r = card.getBoundingClientRect();
       const x = (e.clientX - r.left) / r.width - 0.5;
@@ -7294,7 +7368,7 @@
       card.style.boxShadow = `${-x * 6}px ${y * 6}px 18px rgba(0,0,0,0.1)`;
     });
     document.addEventListener('mouseleave', function (e) {
-      const card = e.target.closest('.stat-card, .wc-item, .wx-detail');
+      const card = (e.target && e.target.closest) ? e.target.closest('.stat-card, .wc-item, .wx-detail') : null;
       if (card) { card.style.transform = ''; card.style.boxShadow = ''; }
     }, true);
 
@@ -7855,6 +7929,30 @@
       CMDS['open calculator'] = () => { OW('calculator'); return [{ c: 'to', t: '🔢 Opening Calculator...' }]; };
       CMDS['open notes'] = () => { OW('notes'); return [{ c: 'to', t: '📝 Opening Sticky Notes...' }]; };
       CMDS['open pomodoro'] = () => { OW('pomodoro'); return [{ c: 'to', t: '⏱️ Opening Pomodoro Timer...' }]; };
+      CMDS['sudo make me a sandwich'] = () => [{ c: 'to', t: '🥪 Okay.' }];
+      CMDS['make me a sandwich'] = () => [{ c: 'te', t: 'What? Make it yourself.' }];
+      CMDS['coffee'] = () => [
+        { c: 'td', t: '      ( (' },
+        { c: 'td', t: '       ) )' },
+        { c: 'to', t: '    ........' },
+        { c: 'to', t: '    |      |]   Brewing... ☕' },
+        { c: 'to', t: '    \\      /' },
+        { c: 'to', t: '     `----’' }
+      ];
+      CMDS['vim'] = () => [{ c: 'te', t: 'Entering Vim... :q! ... just kidding, you can never leave. 😈' }];
+      CMDS['nano'] = () => [{ c: 'to', t: 'Real developers use Vim. (just kidding, use whatever ships it)' }];
+      CMDS['git log'] = () => [
+        { c: 'th', t: 'commit 4d91210  (HEAD -> main)' },
+        { c: 'to', t: '  feat: distributed-queue-engine — priority queues + backoff' },
+        { c: 'th', t: 'commit a4f48e1' },
+        { c: 'to', t: '  feat: enterprise-auth-stack — SAML 2.0 + SCIM provisioning' },
+        { c: 'th', t: 'commit cf7ce73' },
+        { c: 'to', t: '  feat: otel-sdk-node — OTLP tracing + Prometheus metrics' },
+        { c: 'td', t: '  ...run "projects" for the full list' }
+      ];
+      CMDS['uptime'] = () => [{ c: 'to', t: '⚡ up since 2022, 0 unplanned outages, powered by ☕' }];
+      CMDS['man'] = () => [{ c: 'to', t: 'No manual entry. But you can type "help", or just ask me anything.' }];
+      CMDS['history'] = () => [{ c: 'to', t: 'Tip: use ↑ / ↓ to recall your previous commands.' }];
     })();
 
     /* ============================================================
