@@ -5305,6 +5305,26 @@
       <div class="resize-h" data-win="notes"></div>
     </div>
 
+    <!-- ===== SAFARI ===== -->
+    <div class="window" id="win-safari" style="left:160px;top:70px;width:780px;height:520px;display:none">
+      <div class="wbar" data-win="safari">
+        <div class="dots">
+          <div class="dot dot-r" onclick="CW('safari')">✕</div>
+          <div class="dot dot-y" onclick="CW('safari')">−</div>
+          <div class="dot dot-g" onclick="maxW('safari')">+</div>
+        </div>
+        <div class="wtitle">Safari</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px;padding:8px 12px;border-bottom:1px solid rgba(0,0,0,.12);background:rgba(120,120,128,.12)">
+        <span style="color:#999;font-size:13px;letter-spacing:2px">‹ ›</span>
+        <div style="flex:1;background:rgba(120,120,128,.18);border-radius:8px;padding:5px 12px;font-size:12px;color:#555;text-align:center">🔒 sudhanshu1402.github.io</div>
+        <span style="color:#999;font-size:13px">⟳</span>
+      </div>
+      <iframe src="https://sudhanshu1402.github.io/" title="Portfolio" loading="lazy" referrerpolicy="no-referrer"
+        style="flex:1;width:100%;border:0;background:#fff"></iframe>
+      <div class="resize-h" data-win="safari"></div>
+    </div>
+
     <!-- ===== CALCULATOR ===== -->
     <div class="window" id="win-calculator" style="left:200px;top:200px;width:280px;height:440px;display:none">
       <div class="wbar" data-win="calculator">
@@ -5453,6 +5473,11 @@
       <div class="dk run" onclick="OW('terminal')" title="Terminal">
         <div class="dkico ic-term">⌘</div>
         <div class="dk-lbl">Terminal</div>
+        <div class="dk-dot"></div>
+      </div>
+      <div class="dk" onclick="OW('safari')" title="Safari">
+        <div class="dkico" style="background:linear-gradient(160deg,#1e90ff,#0a5bd3);color:#fff">🧭</div>
+        <div class="dk-lbl">Safari</div>
         <div class="dk-dot"></div>
       </div>
       <div class="dk run" onclick="OW('games')" title="Games">
@@ -5835,7 +5860,7 @@
       document.querySelectorAll('.window').forEach(w => w.classList.remove('focused'));
       const w = document.getElementById('win-' + id);
       if (w) { w.classList.add('focused'); w.style.zIndex = ++zTop; }
-      const names = { finder: 'Finder', vscode: 'VS Code', terminal: 'Terminal', profile: 'About Me', skills: 'Skills', stats: 'Stats', weather: 'Weather', worldclock: 'Clock', coverletter: 'Cover Letter', games: 'Games', notes: 'Sticky Notes', calculator: 'Calculator', pomodoro: 'Pomodoro', piano: 'Piano', aboutmac: 'About This Mac' };
+      const names = { finder: 'Finder', vscode: 'VS Code', terminal: 'Terminal', profile: 'About Me', skills: 'Skills', stats: 'Stats', weather: 'Weather', worldclock: 'Clock', coverletter: 'Cover Letter', games: 'Games', notes: 'Sticky Notes', calculator: 'Calculator', pomodoro: 'Pomodoro', piano: 'Piano', aboutmac: 'About This Mac', safari: 'Safari' };
       document.getElementById('active-app').textContent = names[id] || 'Finder';
     }
     function OW(id) {
@@ -6724,7 +6749,7 @@
     const _origOW = OW;
     OW = function (id) {
       playSound('open');
-      const names = { finder: 'Finder', vscode: 'VS Code', terminal: 'Terminal', profile: 'About Me', skills: 'Skills', stats: 'Stats', weather: 'Weather', worldclock: 'Clock', coverletter: 'Cover Letter', games: 'Games', notes: 'Sticky Notes', calculator: 'Calculator', pomodoro: 'Pomodoro', piano: 'Piano', aboutmac: 'About This Mac' };
+      const names = { finder: 'Finder', vscode: 'VS Code', terminal: 'Terminal', profile: 'About Me', skills: 'Skills', stats: 'Stats', weather: 'Weather', worldclock: 'Clock', coverletter: 'Cover Letter', games: 'Games', notes: 'Sticky Notes', calculator: 'Calculator', pomodoro: 'Pomodoro', piano: 'Piano', aboutmac: 'About This Mac', safari: 'Safari' };
       showDynamicIsland(names[id] || id);
       _origOW(id);
     };
@@ -7109,41 +7134,10 @@
     const _tdm = toggleDarkMode;
     toggleDarkMode = function () { _tdm(); trackAchievement('dark'); };
 
-    /* ============================================================
-       R4: SPOTLIGHT ENHANCEMENT (Fuzzy Search)
-       ============================================================ */
-    const allSearchableItems = [];
-    if (typeof DATA !== 'undefined') {
-      ['experience', 'education', 'projects', 'certs', 'interests'].forEach(cat => {
-        if (DATA[cat]) DATA[cat].forEach(item => {
-          allSearchableItems.push({ name: item.name, role: item.role || '', cat: cat, link: item.link || '' });
-        });
-      });
-    }
-    // Override spotlight input handler to fuzzy search
-    const slInput = document.querySelector('.sl-input');
-    if (slInput) {
-      slInput.addEventListener('input', () => {
-        const q = slInput.value.toLowerCase();
-        if (q.length < 2) return;
-        const matches = allSearchableItems.filter(i =>
-          i.name.toLowerCase().includes(q) || i.role.toLowerCase().includes(q) || i.cat.includes(q)
-        ).slice(0, 5);
-        let results = document.getElementById('sl-results');
-        if (!results) {
-          results = document.createElement('div');
-          results.id = 'sl-results';
-          results.style.cssText = 'margin-top:12px;max-height:300px;overflow-y:auto;';
-          slInput.parentElement.appendChild(results);
-        }
-        results.innerHTML = matches.map(m =>
-          `<div style="padding:10px 14px;cursor:pointer;border-bottom:1px solid rgba(0,0,0,0.05);font-size:14px" onclick="${m.link ? "window.open('" + m.link + "','_blank')" : "OW('finder')"};closeSL(event)">
-            <strong>${m.name}</strong> <span style="opacity:0.5;font-size:12px">${m.cat}</span><br>
-            <span style="font-size:12px;opacity:0.6">${m.role}</span>
-          </div>`
-        ).join('') || '<div style="padding:10px 14px;opacity:0.5;font-size:13px">No results found</div>';
-      });
-    }
+    /* R4 fuzzy-search override removed: it added a SECOND input listener that
+       overwrote #sl-results with non-.sl-r markup, breaking the arrow-key nav
+       in slKey. The original slSearch path (inline oninput) is the single
+       source of truth. */
 
     /* ============================================================
        RESPONSIVE ENHANCEMENTS
@@ -7984,6 +7978,110 @@
       });
     })();
 
+  </script>
+
+  <!-- ===== ADDED: login splash · Mission Control · screensaver ===== -->
+  <style>
+    #lae-login{position:fixed;inset:0;z-index:99990;display:flex;align-items:center;justify-content:center;background:rgba(10,12,20,.5);backdrop-filter:blur(30px);-webkit-backdrop-filter:blur(30px);transition:opacity .5s ease;color:#fff;font-family:inherit}
+    #lae-login .lae-li{display:flex;flex-direction:column;align-items:center;gap:14px}
+    #lae-login .lae-av{width:96px;height:96px;border-radius:50%;display:grid;place-items:center;font-size:34px;font-weight:700;color:#fff;background:linear-gradient(160deg,#6ea8fe,#a78bfa);box-shadow:0 10px 40px rgba(0,0,0,.4)}
+    #lae-login .lae-nm{font-size:20px;font-weight:600}
+    #lae-login .lae-btn{margin-top:6px;padding:8px 26px;border:0;border-radius:20px;cursor:pointer;font:inherit;font-size:14px;font-weight:600;color:#111;background:rgba(255,255,255,.92)}
+    #lae-login .lae-btn:hover{background:#fff}
+    #lae-login .lae-hint{font-size:12px;opacity:.55;margin-top:2px}
+    #lae-ss{position:fixed;inset:0;z-index:99995;background:#05070d;color:#e9edf5;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;opacity:0;visibility:hidden;transition:opacity .8s ease;overflow:hidden}
+    #lae-ss.on{opacity:1;visibility:visible}
+    #lae-ss .ss-time{font-size:clamp(48px,12vw,140px);font-weight:200;letter-spacing:2px;font-variant-numeric:tabular-nums;z-index:2}
+    #lae-ss .ss-date{font-size:clamp(14px,3vw,22px);opacity:.6;z-index:2}
+    #lae-ss .ss-hint{position:absolute;bottom:40px;font-size:12px;opacity:.4;z-index:2}
+    #lae-ss .ss-stars{position:absolute;inset:-40px;background-image:radial-gradient(2px 2px at 20% 30%,#fff,transparent),radial-gradient(1px 1px at 70% 60%,#fff,transparent),radial-gradient(1.5px 1.5px at 40% 80%,#bcd,transparent),radial-gradient(1px 1px at 85% 25%,#fff,transparent),radial-gradient(2px 2px at 55% 15%,#9bf,transparent);opacity:.5;animation:ssDrift 60s linear infinite}
+    @keyframes ssDrift{from{transform:translateY(0)}to{transform:translateY(40px)}}
+    #lae-mc{position:fixed;inset:0;z-index:9000;background:rgba(10,12,20,.6);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);display:none;align-items:center;justify-content:center;padding:60px;opacity:0;transition:opacity .25s ease}
+    #lae-mc.on{display:flex;opacity:1}
+    #lae-mc .mc-grid{display:flex;flex-wrap:wrap;gap:22px;justify-content:center;align-items:center;max-width:1100px}
+    #lae-mc .mc-tile{width:200px;height:140px;border-radius:14px;cursor:pointer;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.18);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;color:#fff;transition:transform .18s ease,background .18s ease}
+    #lae-mc .mc-tile:hover{transform:scale(1.06);background:rgba(255,255,255,.16)}
+    #lae-mc .mc-ic{font-size:34px}
+    #lae-mc .mc-nm{font-size:13px;font-weight:600}
+    #lae-mc .mc-empty{color:rgba(255,255,255,.7);font-size:15px}
+    #lae-mc .mc-hint{position:absolute;bottom:34px;color:rgba(255,255,255,.5);font-size:12px}
+  </style>
+  <script>
+    (function () {
+      'use strict';
+      const desktop = () => window.innerWidth > 768;
+
+      /* LOGIN SPLASH — created beneath the boot screen, revealed when it fades.
+         Deferred to a frame after layout so the desktop check reads the settled
+         viewport width (mobile keeps its own iOS lock screen). */
+      function initLogin() {
+        if (!desktop() || document.getElementById('lae-login')) return;
+        const lg = document.createElement('div');
+        lg.id = 'lae-login';
+        lg.innerHTML = '<div class="lae-li"><div class="lae-av">SS</div><div class="lae-nm">Sudhanshu Singh</div><button class="lae-btn" type="button">Log In</button><div class="lae-hint">click or press any key</div></div>';
+        document.body.appendChild(lg);
+        let gone = false;
+        const dismiss = () => { if (gone) return; gone = true; lg.style.opacity = '0'; setTimeout(() => lg.remove(), 500); document.removeEventListener('keydown', dismiss, true); };
+        lg.addEventListener('click', dismiss);
+        document.addEventListener('keydown', dismiss, true);
+        setTimeout(dismiss, 9000); // safety: never trap the user on the splash
+      }
+      setTimeout(initLogin, 0); // setTimeout (not rAF) so it still fires in a background tab
+
+      /* MISSION CONTROL — F3 or Ctrl+Up: grid of open windows, click to focus. */
+      const mc = document.createElement('div');
+      mc.id = 'lae-mc';
+      document.body.appendChild(mc);
+      const ICONS = { finder: '📁', vscode: '⚡', terminal: '⌘', safari: '🧭', games: '🎮', profile: '🙂', skills: '📊', stats: '📈', weather: '⛅', worldclock: '🕐', coverletter: '✉️', notes: '🗒️', calculator: '🔢', pomodoro: '⏱️', piano: '🎹', aboutmac: '🍎' };
+      let mcOpen = false;
+      const openWins = () => [...document.querySelectorAll('.window')].filter(w => w.style.display !== 'none' && getComputedStyle(w).display !== 'none');
+      const closeMC = () => { mcOpen = false; mc.classList.remove('on'); };
+      function toggleMC() {
+        if (!desktop()) return;
+        if (mcOpen) { closeMC(); return; }
+        const wins = openWins();
+        let html = '<div class="mc-grid">';
+        if (!wins.length) html += '<div class="mc-empty">No open windows — open an app from the Dock.</div>';
+        wins.forEach(w => {
+          const id = w.id.replace('win-', '');
+          const titleEl = w.querySelector('.wtitle');
+          const title = titleEl ? titleEl.textContent : id;
+          html += '<div class="mc-tile" data-id="' + id + '"><div class="mc-ic">' + (ICONS[id] || '🪟') + '</div><div class="mc-nm">' + title + '</div></div>';
+        });
+        html += '</div><div class="mc-hint">Mission Control — click a window, or press Esc / F3</div>';
+        mc.innerHTML = html;
+        mc.classList.add('on'); mcOpen = true;
+      }
+      mc.addEventListener('click', e => {
+        const tile = e.target.closest && e.target.closest('.mc-tile');
+        if (tile) { closeMC(); if (typeof focusW === 'function') focusW(tile.dataset.id); }
+        else if (e.target === mc) closeMC();
+      });
+
+      /* SCREENSAVER — fades in after IDLE_MS of no input, dismissed by any input. */
+      const ss = document.createElement('div');
+      ss.id = 'lae-ss';
+      ss.innerHTML = '<div class="ss-stars"></div><div class="ss-time"></div><div class="ss-date"></div><div class="ss-hint">move the mouse or press a key to wake</div>';
+      document.body.appendChild(ss);
+      const ssTime = ss.querySelector('.ss-time'), ssDate = ss.querySelector('.ss-date');
+      const IDLE_MS = 90000;
+      let ssOn = false, ssTimer = 0, ssTick = 0;
+      function ssRender() {
+        const d = new Date();
+        ssTime.textContent = d.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+        ssDate.textContent = d.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
+      }
+      function ssStart() { if (ssOn || !desktop()) return; ssOn = true; ssRender(); ss.classList.add('on'); ssTick = setInterval(ssRender, 10000); }
+      function ssStop() { if (!ssOn) return; ssOn = false; ss.classList.remove('on'); clearInterval(ssTick); }
+      function ssReset() { if (ssOn) ssStop(); clearTimeout(ssTimer); ssTimer = setTimeout(ssStart, IDLE_MS); }
+      ['mousedown', 'keydown', 'wheel', 'touchstart', 'mousemove'].forEach(ev => document.addEventListener(ev, ssReset, { passive: true }));
+      ssReset();
+
+      document.addEventListener('keydown', e => {
+        if (e.key === 'F3' || (e.ctrlKey && e.key === 'ArrowUp')) { e.preventDefault(); toggleMC(); }
+        else if (e.key === 'Escape' && mcOpen) { closeMC(); }
+      });
+    })();
   </script>
 </body>
 
