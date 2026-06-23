@@ -1,5 +1,7 @@
 # sudhanshu1402.github.io
 
+[![Deploy](https://github.com/sudhanshu1402/sudhanshu1402.github.io/actions/workflows/deploy.yml/badge.svg)](https://github.com/sudhanshu1402/sudhanshu1402.github.io/actions/workflows/deploy.yml) [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+
 Personal engineering portfolio and project archive.
 
 A data-driven archive of engineering projects across systems, ML/AI, databases, and 10+ programming languages, organized by domain, difficulty, and type. Built with vanilla HTML, CSS, and JavaScript (zero dependencies, zero build step) and deployed via GitHub Pages.
