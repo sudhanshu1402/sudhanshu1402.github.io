@@ -4,14 +4,49 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sudhanshu Singh - Backend Engineer</title>
-    <meta name="description" content="Backend engineer building distributed systems, authentication infrastructure, and observability tooling. Portfolio and project archive.">
+    <meta name="description" content="Backend engineer building distributed systems, authentication infrastructure, and observability tooling. Featured systems, reference implementations, and a learning archive.">
     <meta name="color-scheme" content="dark light">
+
+    <link rel="canonical" href="https://sudhanshu1402.github.io/">
+    <meta name="theme-color" content="#0a0c10" media="(prefers-color-scheme: dark)">
+    <meta name="theme-color" content="#fafbfc" media="(prefers-color-scheme: light)">
+
+    <!-- Icons -->
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
+    <link rel="apple-touch-icon" href="assets/og-image.png">
 
     <!-- Open Graph -->
     <meta property="og:title" content="Sudhanshu Singh - Backend Engineer">
     <meta property="og:description" content="Distributed systems, auth infrastructure, observability, and LLM orchestration. A working archive of engineering projects.">
     <meta property="og:type" content="website">
-    <meta property="og:url" content="https://sudhanshu1402.github.io">
+    <meta property="og:url" content="https://sudhanshu1402.github.io/">
+    <meta property="og:site_name" content="Sudhanshu Singh">
+    <meta property="og:image" content="https://sudhanshu1402.github.io/assets/og-image.png">
+    <meta property="og:image:width" content="1280">
+    <meta property="og:image:height" content="640">
+    <meta property="og:image:alt" content="Sudhanshu Singh — Backend Engineer">
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Sudhanshu Singh - Backend Engineer">
+    <meta name="twitter:description" content="Distributed systems, auth infrastructure, observability, and LLM orchestration.">
+    <meta name="twitter:image" content="https://sudhanshu1402.github.io/assets/og-image.png">
+
+    <!-- Structured data -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Person",
+      "name": "Sudhanshu Singh",
+      "url": "https://sudhanshu1402.github.io/",
+      "jobTitle": "Backend Engineer",
+      "worksFor": { "@type": "Organization", "name": "Testlify" },
+      "sameAs": [
+        "https://github.com/sudhanshu1402",
+        "https://www.linkedin.com/in/sudhanshusingh1402/"
+      ]
+    }
+    </script>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -434,7 +469,7 @@
 
     <header class="hero">
         <div class="wrap">
-            <span class="eyebrow"><span class="pulse" aria-hidden="true"></span> Backend Engineer @ fiddle-tools</span>
+            <span class="eyebrow"><span class="pulse" aria-hidden="true"></span> Backend Engineer @ Testlify</span>
             <h1>Building <span class="grad">distributed systems</span><br>that hold up in production.</h1>
             <p class="hero-lead">I design and ship backend infrastructure: job orchestration, multi-tenant auth, observability, and LLM pipelines, mostly in TypeScript and Node.js. This is my working archive.</p>
             <div class="cta-row">
@@ -463,12 +498,23 @@
             </div>
         </section>
 
+        <section class="block" id="secondary">
+            <div class="wrap">
+                <div class="section-head">
+                    <h2>Reference implementations</h2>
+                    <span class="sub" id="secondary-sub"></span>
+                </div>
+                <div class="grid" id="secondary-grid"></div>
+            </div>
+        </section>
+
         <section class="block" id="archive">
             <div class="wrap">
                 <div class="section-head">
-                    <h2>Project archive</h2>
+                    <h2>Learning archive</h2>
                     <span class="sub" id="archive-sub"></span>
                 </div>
+                <p style="color:var(--text-mute);font-size:0.9rem;margin:-0.35rem 0 1.35rem;max-width:62ch;">Smaller builds, exercises, and experiments — a public learning trail, not production work.</p>
                 <div class="controls">
                     <div class="search">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
@@ -507,7 +553,7 @@
             <dl>
                 <dt>Category</dt><dd id="modal-category"></dd>
                 <dt>Type</dt><dd id="modal-type"></dd>
-                <dt>Difficulty</dt><dd id="modal-difficulty"></dd>
+                <dt id="modal-difficulty-dt">Difficulty</dt><dd id="modal-difficulty"></dd>
             </dl>
             <a class="btn btn-primary" id="modal-link" href="#" target="_blank" rel="noopener">
                 <span id="modal-link-text">Open</span>
@@ -533,7 +579,8 @@
             var DIFF_COLOR = { Expert: "#f87171", Hard: "#fbbf24", Medium: "#60a5fa", Easy: "#34d399" };
 
             var featured = data.filter(function (p) { return p.tier === "showcase"; });
-            var archive = data.filter(function (p) { return p.tier !== "showcase"; });
+            var secondary = data.filter(function (p) { return p.tier === "secondary"; });
+            var archive = data.filter(function (p) { return p.tier !== "showcase" && p.tier !== "secondary"; });
 
             var $ = function (id) { return document.getElementById(id); };
             var reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -543,13 +590,14 @@
             var stats = [
                 { num: data.length, lbl: "Projects" },
                 { num: uniqueCats.length, lbl: "Categories" },
-                { num: featured.length, lbl: "Production systems" }
+                { num: featured.length, lbl: "Featured projects" }
             ];
             $("stats").innerHTML = stats.map(function (s) {
                 return '<div class="stat"><div class="num">' + s.num + '</div><div class="lbl">' + s.lbl + '</div></div>';
             }).join("");
             $("featured-sub").textContent = featured.length + " flagship";
-            $("archive-sub").textContent = archive.length + " projects";
+            $("secondary-sub").textContent = secondary.length + " reference builds";
+            $("archive-sub").textContent = archive.length + " builds";
             $("year").textContent = "2026";
 
             /* ---------- Card factory ---------- */
@@ -565,8 +613,11 @@
                 card.className = "card" + (proj.tier === "showcase" ? " featured" : "");
                 card.setAttribute("aria-label", "View details for " + proj.name);
 
+                var showDiff = proj.tier === "showcase" || proj.tier === "secondary";
                 var diffColor = DIFF_COLOR[proj.difficulty] || "var(--text-dim)";
-                var topRight = '<span class="diff" style="color:' + diffColor + '">' + escapeHtml(proj.difficulty || "-") + "</span>";
+                var topRight = showDiff
+                    ? '<span class="diff" style="color:' + diffColor + '">' + escapeHtml(proj.difficulty || "-") + "</span>"
+                    : "";
                 var topLeft = proj.tier === "showcase"
                     ? '<span class="badge featured-badge"><span class="led" aria-hidden="true"></span>Featured</span>'
                     : '<span class="badge">' + escapeHtml(label(proj.category)) + "</span>";
@@ -594,6 +645,7 @@
             }
 
             renderGrid($("featured-grid"), featured);
+            renderGrid($("secondary-grid"), secondary);
 
             /* ---------- Filters ---------- */
             var archiveCats = Object.keys(archive.reduce(function (a, p) { a[p.category] = 1; return a; }, {}));
@@ -650,12 +702,16 @@
                 $("modal-title").textContent = proj.name;
                 $("modal-category").textContent = label(proj.category);
                 $("modal-type").textContent = proj.type || "-";
-                $("modal-difficulty").textContent = proj.difficulty || "-";
+
+                var showDiff = proj.tier === "showcase" || proj.tier === "secondary";
+                $("modal-difficulty-dt").hidden = !showDiff;
+                $("modal-difficulty").hidden = !showDiff;
+                if (showDiff) $("modal-difficulty").textContent = proj.difficulty || "-";
 
                 var diffColor = DIFF_COLOR[proj.difficulty] || "var(--text-dim)";
                 var tags = "";
                 if (proj.tier === "showcase") tags += '<span class="badge featured-badge"><span class="led" aria-hidden="true"></span>Featured</span>';
-                tags += '<span class="diff" style="color:' + diffColor + '">' + escapeHtml(proj.difficulty || "-") + "</span>";
+                if (showDiff) tags += '<span class="diff" style="color:' + diffColor + '">' + escapeHtml(proj.difficulty || "-") + "</span>";
                 $("modal-tags").innerHTML = tags;
 
                 var link = $("modal-link");
