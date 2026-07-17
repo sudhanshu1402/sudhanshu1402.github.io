@@ -5315,9 +5315,12 @@
         </div>
         <div class="wtitle">Safari</div>
       </div>
-      <div style="display:flex;align-items:center;gap:8px;padding:8px 12px;border-bottom:1px solid rgba(0,0,0,.12);background:rgba(120,120,128,.12)">
+      <div
+        style="display:flex;align-items:center;gap:8px;padding:8px 12px;border-bottom:1px solid rgba(0,0,0,.12);background:rgba(120,120,128,.12)">
         <span style="color:#999;font-size:13px;letter-spacing:2px">‹ ›</span>
-        <div style="flex:1;background:rgba(120,120,128,.18);border-radius:8px;padding:5px 12px;font-size:12px;color:#555;text-align:center">🔒 sudhanshu1402.github.io</div>
+        <div
+          style="flex:1;background:rgba(120,120,128,.18);border-radius:8px;padding:5px 12px;font-size:12px;color:#555;text-align:center">
+          🔒 sudhanshu1402.github.io</div>
         <span style="color:#999;font-size:13px">⟳</span>
       </div>
       <iframe src="https://sudhanshu1402.github.io/" title="Portfolio" loading="lazy" referrerpolicy="no-referrer"
@@ -7982,29 +7985,201 @@
 
   <!-- ===== ADDED: login splash · Mission Control · screensaver ===== -->
   <style>
-    #lae-login{position:fixed;inset:0;z-index:99990;display:flex;align-items:center;justify-content:center;background:rgba(10,12,20,.5);backdrop-filter:blur(30px);-webkit-backdrop-filter:blur(30px);transition:opacity .5s ease;color:#fff;font-family:inherit}
-    #lae-login .lae-li{display:flex;flex-direction:column;align-items:center;gap:14px}
-    #lae-login .lae-av{width:96px;height:96px;border-radius:50%;display:grid;place-items:center;font-size:34px;font-weight:700;color:#fff;background:linear-gradient(160deg,#6ea8fe,#a78bfa);box-shadow:0 10px 40px rgba(0,0,0,.4)}
-    #lae-login .lae-nm{font-size:20px;font-weight:600}
-    #lae-login .lae-btn{margin-top:6px;padding:8px 26px;border:0;border-radius:20px;cursor:pointer;font:inherit;font-size:14px;font-weight:600;color:#111;background:rgba(255,255,255,.92)}
-    #lae-login .lae-btn:hover{background:#fff}
-    #lae-login .lae-hint{font-size:12px;opacity:.55;margin-top:2px}
-    #lae-ss{position:fixed;inset:0;z-index:99995;background:#05070d;color:#e9edf5;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;opacity:0;visibility:hidden;transition:opacity .8s ease;overflow:hidden}
-    #lae-ss.on{opacity:1;visibility:visible}
-    #lae-ss .ss-time{font-size:clamp(48px,12vw,140px);font-weight:200;letter-spacing:2px;font-variant-numeric:tabular-nums;z-index:2}
-    #lae-ss .ss-date{font-size:clamp(14px,3vw,22px);opacity:.6;z-index:2}
-    #lae-ss .ss-hint{position:absolute;bottom:40px;font-size:12px;opacity:.4;z-index:2}
-    #lae-ss .ss-stars{position:absolute;inset:-40px;background-image:radial-gradient(2px 2px at 20% 30%,#fff,transparent),radial-gradient(1px 1px at 70% 60%,#fff,transparent),radial-gradient(1.5px 1.5px at 40% 80%,#bcd,transparent),radial-gradient(1px 1px at 85% 25%,#fff,transparent),radial-gradient(2px 2px at 55% 15%,#9bf,transparent);opacity:.5;animation:ssDrift 60s linear infinite}
-    @keyframes ssDrift{from{transform:translateY(0)}to{transform:translateY(40px)}}
-    #lae-mc{position:fixed;inset:0;z-index:9000;background:rgba(10,12,20,.6);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);display:none;align-items:center;justify-content:center;padding:60px;opacity:0;transition:opacity .25s ease}
-    #lae-mc.on{display:flex;opacity:1}
-    #lae-mc .mc-grid{display:flex;flex-wrap:wrap;gap:22px;justify-content:center;align-items:center;max-width:1100px}
-    #lae-mc .mc-tile{width:200px;height:140px;border-radius:14px;cursor:pointer;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.18);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;color:#fff;transition:transform .18s ease,background .18s ease}
-    #lae-mc .mc-tile:hover{transform:scale(1.06);background:rgba(255,255,255,.16)}
-    #lae-mc .mc-ic{font-size:34px}
-    #lae-mc .mc-nm{font-size:13px;font-weight:600}
-    #lae-mc .mc-empty{color:rgba(255,255,255,.7);font-size:15px}
-    #lae-mc .mc-hint{position:absolute;bottom:34px;color:rgba(255,255,255,.5);font-size:12px}
+    #lae-login {
+      position: fixed;
+      inset: 0;
+      z-index: 99990;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(10, 12, 20, .5);
+      backdrop-filter: blur(30px);
+      -webkit-backdrop-filter: blur(30px);
+      transition: opacity .5s ease;
+      color: #fff;
+      font-family: inherit
+    }
+
+    #lae-login .lae-li {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 14px
+    }
+
+    #lae-login .lae-av {
+      width: 96px;
+      height: 96px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      font-size: 34px;
+      font-weight: 700;
+      color: #fff;
+      background: linear-gradient(160deg, #6ea8fe, #a78bfa);
+      box-shadow: 0 10px 40px rgba(0, 0, 0, .4)
+    }
+
+    #lae-login .lae-nm {
+      font-size: 20px;
+      font-weight: 600
+    }
+
+    #lae-login .lae-btn {
+      margin-top: 6px;
+      padding: 8px 26px;
+      border: 0;
+      border-radius: 20px;
+      cursor: pointer;
+      font: inherit;
+      font-size: 14px;
+      font-weight: 600;
+      color: #111;
+      background: rgba(255, 255, 255, .92)
+    }
+
+    #lae-login .lae-btn:hover {
+      background: #fff
+    }
+
+    #lae-login .lae-hint {
+      font-size: 12px;
+      opacity: .55;
+      margin-top: 2px
+    }
+
+    #lae-ss {
+      position: fixed;
+      inset: 0;
+      z-index: 99995;
+      background: #05070d;
+      color: #e9edf5;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity .8s ease;
+      overflow: hidden
+    }
+
+    #lae-ss.on {
+      opacity: 1;
+      visibility: visible
+    }
+
+    #lae-ss .ss-time {
+      font-size: clamp(48px, 12vw, 140px);
+      font-weight: 200;
+      letter-spacing: 2px;
+      font-variant-numeric: tabular-nums;
+      z-index: 2
+    }
+
+    #lae-ss .ss-date {
+      font-size: clamp(14px, 3vw, 22px);
+      opacity: .6;
+      z-index: 2
+    }
+
+    #lae-ss .ss-hint {
+      position: absolute;
+      bottom: 40px;
+      font-size: 12px;
+      opacity: .4;
+      z-index: 2
+    }
+
+    #lae-ss .ss-stars {
+      position: absolute;
+      inset: -40px;
+      background-image: radial-gradient(2px 2px at 20% 30%, #fff, transparent), radial-gradient(1px 1px at 70% 60%, #fff, transparent), radial-gradient(1.5px 1.5px at 40% 80%, #bcd, transparent), radial-gradient(1px 1px at 85% 25%, #fff, transparent), radial-gradient(2px 2px at 55% 15%, #9bf, transparent);
+      opacity: .5;
+      animation: ssDrift 60s linear infinite
+    }
+
+    @keyframes ssDrift {
+      from {
+        transform: translateY(0)
+      }
+
+      to {
+        transform: translateY(40px)
+      }
+    }
+
+    #lae-mc {
+      position: fixed;
+      inset: 0;
+      z-index: 9000;
+      background: rgba(10, 12, 20, .6);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 60px;
+      opacity: 0;
+      transition: opacity .25s ease
+    }
+
+    #lae-mc.on {
+      display: flex;
+      opacity: 1
+    }
+
+    #lae-mc .mc-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 22px;
+      justify-content: center;
+      align-items: center;
+      max-width: 1100px
+    }
+
+    #lae-mc .mc-tile {
+      width: 200px;
+      height: 140px;
+      border-radius: 14px;
+      cursor: pointer;
+      background: rgba(255, 255, 255, .08);
+      border: 1px solid rgba(255, 255, 255, .18);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      color: #fff;
+      transition: transform .18s ease, background .18s ease
+    }
+
+    #lae-mc .mc-tile:hover {
+      transform: scale(1.06);
+      background: rgba(255, 255, 255, .16)
+    }
+
+    #lae-mc .mc-ic {
+      font-size: 34px
+    }
+
+    #lae-mc .mc-nm {
+      font-size: 13px;
+      font-weight: 600
+    }
+
+    #lae-mc .mc-empty {
+      color: rgba(255, 255, 255, .7);
+      font-size: 15px
+    }
+
+    #lae-mc .mc-hint {
+      position: absolute;
+      bottom: 34px;
+      color: rgba(255, 255, 255, .5);
+      font-size: 12px
+    }
   </style>
   <script>
     (function () {
