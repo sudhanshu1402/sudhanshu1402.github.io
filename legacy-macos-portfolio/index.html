@@ -3,7 +3,7 @@
 
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Sudhanshu Singh — Portfolio</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -5619,7 +5619,7 @@
       ],
       projects: [
         {
-          icon: '🤖', name: 'Subconscious Mind for Robots', role: 'Active Research Project', badge: { t: 'ACTIVE', c: 'bg-g' }, period: '2024→Present', loc: 'Personal R&D', link: 'https://github.com/sudhanshu1402/personal-projects/tree/main/ML_Projects/subconscious-robotics',
+          icon: '🤖', name: 'Subconscious Mind for Robots', role: 'Active Research Project', badge: { t: 'ACTIVE', c: 'bg-g' }, period: '2024→Present', loc: 'Personal R&D', link: 'https://github.com/sudhanshu1402/engineering-projects/tree/main/machine-learning/subconscious-robotics',
           bullets: ['Autonomous <b>self-training AI framework</b> as a "subconscious layer" for robotic agents.', 'Enables <b>continuous unsupervised learning</b> + real-world environment mapping.', 'Exploring generative model architectures for adaptive, unstructured decision-making.']
         },
         {
@@ -6650,10 +6650,23 @@
     /* ============================================================
        RESUME DOWNLOAD
        ============================================================ */
-    function downloadResume() {
+    // resume.pdf is not in the repo, so check before promising a download.
+    async function downloadResume() {
+      const url = 'https://sudhanshu1402.github.io/resume.pdf';
+      let ok = false;
+      try {
+        ok = (await fetch(url, { method: 'HEAD' })).ok;
+      } catch (e) {
+        ok = false;
+      }
+      if (!ok) {
+        notify('Resume', 'Not published yet — opening LinkedIn instead.', '📎');
+        window.open('https://www.linkedin.com/in/sudhanshusingh1402/', '_blank', 'noopener');
+        return;
+      }
       notify('Resume', 'Downloading Sudhanshu\'s Resume...', '📎');
       const link = document.createElement('a');
-      link.href = 'https://sudhanshu1402.github.io/resume.pdf';
+      link.href = url;
       link.download = 'Sudhanshu_Singh_Resume.pdf';
       link.target = '_blank';
       link.click();

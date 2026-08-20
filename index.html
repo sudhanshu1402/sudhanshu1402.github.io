@@ -74,7 +74,11 @@
             --border-strong: #313a47;
             --text: #e6e9ef;
             --text-dim: #9aa4b2;
-            --text-mute: #626c7a;
+            --text-mute: #8b95a5;
+            --diff-expert: #f87171;
+            --diff-hard: #fbbf24;
+            --diff-medium: #60a5fa;
+            --diff-easy: #34d399;
             --accent: #6ea8fe;
             --accent-2: #a78bfa;
             --accent-soft: rgba(110, 168, 254, 0.12);
@@ -92,7 +96,11 @@
             --border-strong: #d0d7de;
             --text: #0d1117;
             --text-dim: #57606a;
-            --text-mute: #8b949e;
+            --text-mute: #6b7280;
+            --diff-expert: #b91c1c;
+            --diff-hard: #92400e;
+            --diff-medium: #1d4ed8;
+            --diff-easy: #047857;
             --accent: #2563eb;
             --accent-2: #7c3aed;
             --accent-soft: rgba(37, 99, 235, 0.08);
@@ -339,10 +347,15 @@
         .badge.featured-badge { color: var(--accent); border-color: color-mix(in srgb, var(--accent) 55%, transparent); display: inline-flex; align-items: center; gap: 0.3rem; }
         .badge.featured-badge .led { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 6px var(--accent); }
         .diff { font-family: var(--font-mono); font-size: 0.66rem; font-weight: 500; padding: 0.22rem 0.55rem; border-radius: 999px; border: 1px solid currentColor; }
+        .diff.d-expert { color: var(--diff-expert); }
+        .diff.d-hard { color: var(--diff-hard); }
+        .diff.d-medium { color: var(--diff-medium); }
+        .diff.d-easy { color: var(--diff-easy); }
         .card-body h3 { font-family: var(--font-display); font-size: 1.18rem; font-weight: 600; line-height: 1.25; margin-bottom: 0.35rem; }
         .card-meta { font-size: 0.85rem; color: var(--text-dim); }
         .card-foot { margin-top: auto; display: flex; align-items: center; justify-content: space-between; }
-        .card-foot .open { font-family: var(--font-mono); font-size: 0.74rem; color: var(--text-mute); transition: color 0.2s; }
+        .card-foot .open { font-family: var(--font-mono); font-size: 0.74rem; color: var(--text-mute); background: none; border: 0; padding: 0; cursor: pointer; transition: color 0.2s; }
+        .card-foot .open:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 4px; }
         .card:hover .card-foot .open { color: var(--accent); }
         .card-foot svg { width: 16px; height: 16px; color: var(--text-mute); transition: transform 0.25s var(--ease), color 0.2s; }
         .card:hover .card-foot svg { transform: translate(3px, -3px); color: var(--accent); }
@@ -402,6 +415,8 @@
             transition: opacity 0.25s, visibility 0.25s;
         }
         .modal-overlay.open { opacity: 1; visibility: visible; }
+        /* display: grid above outranks the UA [hidden] rule, so hidden alone hid nothing. */
+        .modal-overlay[hidden] { display: none; }
         .modal {
             background: var(--bg-elev);
             border: 1px solid var(--border-strong);
@@ -435,6 +450,7 @@
         .foot-links a:hover { color: var(--accent); }
 
         @media (max-width: 620px) {
+            .nav-inner { flex-wrap: wrap; row-gap: 0.5rem; }
             .nav-links a { padding: 0.45rem 0.5rem; font-size: 0.8rem; }
             .brand span.tag { display: none; }
             .grid { grid-template-columns: 1fr; }
@@ -576,7 +592,10 @@
             };
             var label = function (c) { return LABELS[c] || c; };
 
-            var DIFF_COLOR = { Expert: "#f87171", Hard: "#fbbf24", Medium: "#60a5fa", Easy: "#34d399" };
+            // Class, not a hex map: the pill colour has to differ per theme, and the
+            // light-theme hexes failed contrast against the white card.
+            var DIFF_CLASS = { Expert: "d-expert", Hard: "d-hard", Medium: "d-medium", Easy: "d-easy" };
+            var diffClass = function (d) { return DIFF_CLASS[d] || ""; };
 
             var featured = data.filter(function (p) { return p.tier === "showcase"; });
             var secondary = data.filter(function (p) { return p.tier === "secondary"; });
@@ -598,7 +617,7 @@
             $("featured-sub").textContent = featured.length + " flagship";
             $("secondary-sub").textContent = secondary.length + " reference builds";
             $("archive-sub").textContent = archive.length + " builds";
-            $("year").textContent = "2026";
+            $("year").textContent = new Date().getFullYear();
 
             /* ---------- Card factory ---------- */
             function escapeHtml(str) {
@@ -608,15 +627,14 @@
             }
 
             function makeCard(proj, idx) {
-                var card = document.createElement("button");
-                card.type = "button";
+                // article, not button: a button may not contain an h3, which hid all
+                // 90 project titles from the heading outline and from screen readers.
+                var card = document.createElement("article");
                 card.className = "card" + (proj.tier === "showcase" ? " featured" : "");
-                card.setAttribute("aria-label", "View details for " + proj.name);
 
                 var showDiff = proj.tier === "showcase" || proj.tier === "secondary";
-                var diffColor = DIFF_COLOR[proj.difficulty] || "var(--text-dim)";
                 var topRight = showDiff
-                    ? '<span class="diff" style="color:' + diffColor + '">' + escapeHtml(proj.difficulty || "-") + "</span>"
+                    ? '<span class="diff ' + diffClass(proj.difficulty) + '">' + escapeHtml(proj.difficulty || "-") + "</span>"
                     : "";
                 var topLeft = proj.tier === "showcase"
                     ? '<span class="badge featured-badge"><span class="led" aria-hidden="true"></span>Featured</span>'
@@ -629,10 +647,11 @@
                         '<div class="card-meta">' + escapeHtml(label(proj.category)) + " / " + escapeHtml(proj.type || "") + "</div>" +
                     "</div>" +
                     '<div class="card-foot">' +
-                        '<span class="open">' + escapeHtml(proj.actionText || "View") + "</span>" +
+                        '<button type="button" class="open" aria-label="View details for ' + escapeHtml(proj.name) + '">' + escapeHtml(proj.actionText || "View") + "</button>" +
                         '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"/></svg>' +
                     "</div>";
 
+                // The button is the keyboard path; the card stays mouse-clickable.
                 card.addEventListener("click", function () { openModal(proj); });
                 return card;
             }
@@ -708,10 +727,9 @@
                 $("modal-difficulty").hidden = !showDiff;
                 if (showDiff) $("modal-difficulty").textContent = proj.difficulty || "-";
 
-                var diffColor = DIFF_COLOR[proj.difficulty] || "var(--text-dim)";
                 var tags = "";
                 if (proj.tier === "showcase") tags += '<span class="badge featured-badge"><span class="led" aria-hidden="true"></span>Featured</span>';
-                if (showDiff) tags += '<span class="diff" style="color:' + diffColor + '">' + escapeHtml(proj.difficulty || "-") + "</span>";
+                if (showDiff) tags += '<span class="diff ' + diffClass(proj.difficulty) + '">' + escapeHtml(proj.difficulty || "-") + "</span>";
                 $("modal-tags").innerHTML = tags;
 
                 var link = $("modal-link");
