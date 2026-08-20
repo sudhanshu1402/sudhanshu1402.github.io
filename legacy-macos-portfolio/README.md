@@ -62,10 +62,13 @@ Ambient particles, parallax wallpaper, 3D-tilt cards, ripple click effects, a ty
 
 ## Stack
 
-Plain HTML, CSS, and vanilla JavaScript. The only external network dependencies are Google Fonts (DM Sans, JetBrains Mono, Outfit) and two assets served from the `github.io` domain — `resume.pdf` (the Terminal/menu resume download) and wallpaper images. There are no runtime libraries.
+Plain HTML, CSS, and vanilla JavaScript. The only external network dependencies are Google Fonts (DM Sans, JetBrains Mono, Outfit) and wallpaper images served from the `github.io` domain. There are no runtime libraries.
+
+The Terminal and menu resume download expects `resume.pdf` at the site root. That file is not committed, so the button HEAD-checks it and falls back to opening the LinkedIn profile. Drop a `resume.pdf` in the repo root to make it a real download.
 
 ## Notes
 
 - Some performance care is taken deliberately: window drags drop the backdrop blur mid-drag, the clock skips its DOM rebuild when hidden, and per-frame writes are batched into `requestAnimationFrame`.
 - This is a personal portfolio piece, not a component library — it's one file meant to be visited, not imported. Treat the code as a self-contained demo.
 - It's labeled "legacy" because a newer portfolio has since replaced it at the live URL. Everything here still works standalone.
+- Accessibility limit, stated on purpose: the desktop shell is mouse-first. Dock icons, window chrome, and most desktop controls are `div`s with `onclick` handlers and no `role`, `tabindex`, or key handling, so they are not keyboard reachable. Pinch zoom works and content is readable, but anyone navigating by keyboard should use the main portfolio at [sudhanshu1402.github.io](https://sudhanshu1402.github.io), which is built for it. Fixing the shell properly means rewriting the control layer, which is not planned for an archived piece.

@@ -4,7 +4,7 @@
 
 Personal engineering portfolio and project archive.
 
-A single-page site that lists my engineering work: a handful of featured systems (queue engine, auth stack, tracing SDK, LLM pipeline) up top, then a searchable archive of 90 projects across 10 languages and domains like systems, ML/AI, and databases. Everything renders from one JavaScript data file. No framework, no build step.
+A single-page site that lists my engineering work: six featured systems (keel, nocap, queue engine, auth stack, LLM pipeline, system design portal) up top, two reference implementations, then a searchable archive of 84 projects across 10 languages and domains like systems, ML/AI, and databases. Everything renders from one JavaScript data file. No framework, no build step.
 
 ## Live
 
@@ -19,7 +19,7 @@ Two files do the work:
 
 At load, the script partitions `PROJECT_DATA` by `tier`:
 
-- `tier: "showcase"` → **Featured systems** (currently 4)
+- `tier: "showcase"` → **Featured systems** (currently 6)
 - `tier: "secondary"` → **Reference implementations** (currently 2)
 - everything else → **Learning archive** (currently 84), the only section with search and category chips
 
@@ -43,6 +43,14 @@ python3 -m http.server 8000
 ## Deploy
 
 `.github/workflows/deploy.yml` publishes to GitHub Pages on every push to `main` (and via manual `workflow_dispatch`). It uploads the repo root as the Pages artifact — no build stage.
+
+`.github/workflows/links.yml` runs `scripts/check-links.mjs` on push, on pull requests, and weekly. That script HEAD-checks every `actionUrl` in `projects_data.js` plus every external `href` in `index.html`, and fails on anything that does not answer 2xx. Run it locally the same way:
+
+```bash
+node scripts/check-links.mjs
+```
+
+It is a separate workflow on purpose: a rate-limited third-party host should report a broken link, not block the deploy.
 
 ## Add or edit a project
 
