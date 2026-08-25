@@ -2,87 +2,46 @@
 
 [![Deploy](https://github.com/sudhanshu1402/sudhanshu1402.github.io/actions/workflows/deploy.yml/badge.svg)](https://github.com/sudhanshu1402/sudhanshu1402.github.io/actions/workflows/deploy.yml) [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
-Personal engineering portfolio and project archive.
+My engineering portfolio: one static page, 92 projects, no framework and no build step. Live at [sudhanshu1402.github.io](https://sudhanshu1402.github.io).
 
-A single-page site that lists my engineering work: six featured systems (keel, nocap, queue engine, auth stack, LLM pipeline, system design portal) up top, two reference implementations, then a searchable archive of 84 projects across 10 languages and domains like systems, ML/AI, and databases. Everything renders from one JavaScript data file. No framework, no build step.
+<img src="https://raw.githubusercontent.com/sudhanshu1402/sudhanshu1402.github.io/main/assets/screens/home.png" width="100%" alt="Portfolio hero reading 'Building distributed systems that hold up in production', with counters for 92 projects, 14 categories and 6 featured projects." />
 
-## Live
+The landing view. Every number in it is counted from the data file at runtime.
 
-[sudhanshu1402.github.io](https://sudhanshu1402.github.io)
+## What is on the page
+
+<img src="https://raw.githubusercontent.com/sudhanshu1402/sudhanshu1402.github.io/main/assets/screens/featured.png" width="100%" alt="Featured systems: a grid of cards for keel, nocap, Distributed Queue Engine, LLM Assessment Pipeline, Enterprise Auth Stack and System Design Portal, above the Reference implementations section." />
+
+Six featured systems, then two reference implementations. Each card opens a detail modal or links straight to source.
+
+<img src="https://raw.githubusercontent.com/sudhanshu1402/sudhanshu1402.github.io/main/assets/screens/archive.png" width="100%" alt="Learning archive: a search box, category chips for ML/AI, Python, Java, C, C++, Rust, Go, C#, TypeScript, Node.js and JavaScript, and a grid of project cards." />
+
+The archive holds the other 84 builds, and it is the only section with live search and category filters.
 
 ## How it works
 
-Two files do the work:
+`projects_data.js` exposes one global `PROJECT_DATA` array. `index.html` is the whole UI in a single file: inline CSS and JS, search, filters, a `role="dialog"` modal with focus trapping, and a light/dark toggle persisted to `localStorage`. Counters, subtitles and chips are derived from the array, so they cannot drift from the data. Every field passes through an `escapeHtml` helper before it reaches `innerHTML`.
 
-- `index.html` — the whole UI in one file: inline CSS, inline JS, no external scripts beyond Google Fonts. Handles the hero, the three project sections, category filters, live search, an accessible detail modal (focus trap, Escape to close, restores focus on close), and a light/dark toggle that persists to `localStorage`.
-- `projects_data.js` — the single source of truth. Exposes a global `PROJECT_DATA` array; each entry is a plain object (`name`, `category`, `type`, `difficulty`, `actionUrl`, `actionText`, and an optional `tier`).
-
-At load, the script partitions `PROJECT_DATA` by `tier`:
-
-- `tier: "showcase"` → **Featured systems** (currently 6)
-- `tier: "secondary"` → **Reference implementations** (currently 2)
-- everything else → **Learning archive** (currently 84), the only section with search and category chips
-
-Hero stat counters (total projects, categories, featured count) and section subtitles are all derived from the array at runtime, so they never drift from the data.
-
-## Stack
-
-- Vanilla HTML, CSS, JavaScript. No dependencies, no bundler.
-- Google Fonts (Inter, Space Grotesk, JetBrains Mono).
-- GitHub Pages for hosting; `.nojekyll` so the static files are served as-is.
+To add a project, append an object to `PROJECT_DATA`. `tier: "showcase"` or `"secondary"` features it; no `tier` means archive.
 
 ## Run locally
 
-No build. Open `index.html` in a browser, or serve the folder:
-
 ```bash
 python3 -m http.server 8000
-# then open http://localhost:8000
 ```
 
-## Deploy
+## Checks and deploy
 
-`.github/workflows/deploy.yml` publishes to GitHub Pages on every push to `main` (and via manual `workflow_dispatch`). It uploads the repo root as the Pages artifact — no build stage.
+`deploy.yml` uploads the repo root to GitHub Pages on every push to `main`. `links.yml` runs `node scripts/check-links.mjs`, which HEAD-checks every `actionUrl` and external `href` and fails on anything that does not answer 2xx. Separate workflow on purpose: a rate-limited host should report a broken link, not block the deploy.
 
-`.github/workflows/links.yml` runs `scripts/check-links.mjs` on push, on pull requests, and weekly. That script HEAD-checks every `actionUrl` in `projects_data.js` plus every external `href` in `index.html`, and fails on anything that does not answer 2xx. Run it locally the same way:
-
-```bash
-node scripts/check-links.mjs
-```
-
-It is a separate workflow on purpose: a rate-limited third-party host should report a broken link, not block the deploy.
-
-## Add or edit a project
-
-Append an object to `PROJECT_DATA` in `projects_data.js`:
-
-```js
-{
-    name: "Rate Limiter",
-    category: "Go",
-    type: "Backend / CLI",
-    difficulty: "Medium",
-    actionUrl: "https://github.com/sudhanshu1402/engineering-projects/tree/main/go/medium/rate-limiter",
-    actionText: "View Source Code"
-    // omit `tier` to land in the searchable archive;
-    // set tier: "showcase" or "secondary" to feature it
-}
-```
-
-Counts, filters, and search pick it up automatically. Category keys like `Cpp`, `CSharp`, and `Nodejs` are mapped to display labels (`C++`, `C#`, `Node.js`) via the `LABELS` table in `index.html`. `difficulty` is only shown for showcase and secondary cards; archive cards hide it.
-
-## Notable details
-
-- **Zero XSS surface from data.** Every field pulled from `PROJECT_DATA` is passed through an `escapeHtml` helper before it touches `innerHTML`.
-- **Accessibility.** Skip link, `aria-pressed` filter chips, a real `role="dialog"` modal with focus trapping, and `prefers-reduced-motion` handling that disables the scroll-reveal animation.
-- **SEO/social.** Canonical URL, Open Graph + Twitter cards, and JSON-LD `Person` structured data live in the `<head>`; `sitemap.xml` and `robots.txt` are checked in.
+`scripts/make-screens.sh` regenerates the screenshots above with headless Chrome against the live site. Run by hand, not gated in CI: a live capture is not byte-deterministic, so a diff check would fail every run.
 
 ## Also see
 
-- [System Design Portal](https://sudhanshu1402.github.io/system-design-portal) — architecture write-ups the featured cards link to.
-- [GitHub profile](https://github.com/sudhanshu1402)
-- [macOS Edition](https://sudhanshu1402.github.io/legacy-macos-portfolio/) — the same portfolio rebuilt as a fake macOS desktop, for fun (source in `legacy-macos-portfolio/`).
+- [System Design Portal](https://sudhanshu1402.github.io/system-design-portal/) for the architecture write-ups the featured cards link to.
+- [macOS Edition](https://sudhanshu1402.github.io/legacy-macos-portfolio/), the same portfolio as a fake desktop (source in `legacy-macos-portfolio/`).
+- [GitHub profile](https://github.com/sudhanshu1402).
 
 ## License
 
-MIT — see [LICENSE](LICENSE).
+MIT, see [LICENSE](LICENSE).
